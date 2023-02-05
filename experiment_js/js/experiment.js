@@ -75,9 +75,13 @@ var loadData = function(svgEl){
 /****************************************/
 
 
+var time1;
+var time2;
+
 var startExperiment = function(event) {
   event.preventDefault();
-
+  
+  ctx.loggedTrials = [["DesignName","ParticipantID","TrialID","Block","Trial","VV","OC","visualSearchTime","ErrorCount"]];
   // set the trial counter to the first trial to run
   // ctx.participant, ctx.startBlock and ctx.startTrial contain values selected in combo boxes
 
@@ -106,7 +110,20 @@ var startExperiment = function(event) {
 }
 
 var nextTrial = function() {
+  
+  if(ctx.cpt >= 0) {
+    console.log(ctx.trials[ctx.cpt]["DesignName"]);
+    
+    ctx.loggedTrials.push([ctx.trials[ctx.cpt]["DesignName"],ctx.trials[ctx.cpt]["ParticipantID"],
+                           ctx.trials[ctx.cpt]["TrialID"],ctx.trials[ctx.cpt]["Block1"], 
+                           ctx.trials[ctx.cpt]["Block2"],ctx.trials[ctx.cpt]["VV"],
+                           ctx.trials[ctx.cpt]["OC"],ctx.trials[ctx.cpt]["ParticipantID"],time2-time1, 0])
+
+   //ctx.loggedTrials.push( [ctx.trials[ctx.cpt]] )
+    console.log(ctx.loggedTrials);
+  }
   ctx.cpt++;
+  
   displayInstructions();
 }
 
@@ -137,10 +154,10 @@ var displayInstructions = function() {
 }
 
 var displayShapes = function() {
+
   ctx.state = state.SHAPES;
 
-  //var visualVariable = ctx.trials[ctx.cpt]["VV"];
-  var visualVariable = "ColorSize"
+  var visualVariable = ctx.trials[ctx.cpt]["VV"];
   var oc = ctx.trials[ctx.cpt]["OC"];
   if(oc === "Small") {
     objectCount = 9;
@@ -267,7 +284,7 @@ var displayShapes = function() {
             color : "Blue"
           })
         }
-      } else if(targetSize == 20 && targetColor == "LightBlue") {
+      } else  {
           if(i < num){
             objectsAppearance.push({
               size: 10,
@@ -359,11 +376,15 @@ var keyListener = function(event) {
 
   if(ctx.state == state.INSTRUCTIONS && event.code == "Enter") {
     d3.select("#instructions").remove();
+    time1 = Date.now();
+    console.log(time1)
     displayShapes();
   }
 
   else if(ctx.state == state.SHAPES && event.code == "Space") {
     d3.select("#shapes").remove();
+    time2 = Date.now();
+    console.log(time2)
     displayPlaceholders();
   }
 
