@@ -26,6 +26,7 @@ var ctx = {
 
   state:state.NONE,
   targetIndex:0,
+  errors:0,
 
   // TODO log measures
   // loggedTrials is a 2-dimensional array where we store our log file
@@ -117,13 +118,17 @@ var nextTrial = function() {
     ctx.loggedTrials.push([ctx.trials[ctx.cpt]["DesignName"],ctx.trials[ctx.cpt]["ParticipantID"],
                            ctx.trials[ctx.cpt]["TrialID"],ctx.trials[ctx.cpt]["Block1"], 
                            ctx.trials[ctx.cpt]["Block2"],ctx.trials[ctx.cpt]["VV"],
-                           ctx.trials[ctx.cpt]["OC"],ctx.trials[ctx.cpt]["ParticipantID"],time2-time1, 0])
+                           ctx.trials[ctx.cpt]["OC"],time2-time1, ctx.errors])
 
    //ctx.loggedTrials.push( [ctx.trials[ctx.cpt]] )
     console.log(ctx.loggedTrials);
   }
+  ctx.errors=0;
   ctx.cpt++;
-  
+
+  if(ctx.cpt >= 1 && ctx.trials[ctx.cpt]["ParticipantID"] != ctx.trials[ctx.cpt-1]["ParticipantID"]) {
+    return(0);
+  }
   displayInstructions();
 }
 
@@ -354,17 +359,22 @@ var displayPlaceholders = function() {
   var gridCoords = gridCoordinates(objectCount, 60);
   for (var i = 0; i < objectCount; i++) {
     var placeholder = group.append("rect")
+        .attr("id", i)
         .attr("x", gridCoords[i].x-28)
         .attr("y", gridCoords[i].y-28)
         .attr("width", 56)
         .attr("height", 56)
         .attr("fill", "Gray");
 
-
     placeholder.on("click",
         function() {
           d3.select("#placeholders").remove();
-          nextTrial();
+          if(this.id == ctx.targetIndex) {
+            nextTrial();
+          } else {
+            ctx.errors++;
+            displayInstructions();
+          }
         }
       );
 
@@ -377,14 +387,12 @@ var keyListener = function(event) {
   if(ctx.state == state.INSTRUCTIONS && event.code == "Enter") {
     d3.select("#instructions").remove();
     time1 = Date.now();
-    console.log(time1)
     displayShapes();
   }
 
   else if(ctx.state == state.SHAPES && event.code == "Space") {
     d3.select("#shapes").remove();
     time2 = Date.now();
-    console.log(time2)
     displayPlaceholders();
   }
 
