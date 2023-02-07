@@ -78,6 +78,7 @@ var loadData = function(svgEl){
 
 var time1;
 var time2;
+var currentParticipant = 1;
 
 var startExperiment = function(event) {
   event.preventDefault();
@@ -111,30 +112,25 @@ var startExperiment = function(event) {
 }
 
 var nextTrial = function() {
-  
-  if(ctx.cpt >= 0) {
-    console.log(ctx.trials[ctx.cpt]["DesignName"]);
-    
+  if(ctx.cpt >= 0 && ctx.trials[ctx.cpt]["ParticipantID"] == currentParticipant) {
     ctx.loggedTrials.push([ctx.trials[ctx.cpt]["DesignName"],ctx.trials[ctx.cpt]["ParticipantID"],
                            ctx.trials[ctx.cpt]["TrialID"],ctx.trials[ctx.cpt]["Block1"], 
                            ctx.trials[ctx.cpt]["Block2"],ctx.trials[ctx.cpt]["VV"],
                            ctx.trials[ctx.cpt]["OC"],time2-time1, ctx.errors])
-
-   //ctx.loggedTrials.push( [ctx.trials[ctx.cpt]] )
-    console.log(ctx.loggedTrials);
   }
   ctx.errors=0;
   ctx.cpt++;
-
-  if(ctx.cpt >= 1 && ctx.trials[ctx.cpt]["ParticipantID"] != ctx.trials[ctx.cpt-1]["ParticipantID"]) {
+  if(ctx.cpt >= 0 && ctx.trials[ctx.cpt]["ParticipantID"] != currentParticipant) {
     return(0);
+    
   }
+
   displayInstructions();
 }
 
 var displayInstructions = function() {
   ctx.state = state.INSTRUCTIONS;
-
+  
   d3.select("#instructionsCanvas")
     .append("div")
     .attr("id", "instructions")
@@ -522,6 +518,7 @@ var setParticipant = function(participantID) {
 function onchangeParticipant() {
   selectValue = d3.select("#participantSel").property("value");
   setParticipant(selectValue);
+  currentParticipant = selectValue;
 };
 
 function onchangeBlock() {
