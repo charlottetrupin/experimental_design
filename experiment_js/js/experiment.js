@@ -120,11 +120,16 @@ var nextTrial = function() {
   }
   ctx.errors=0;
   ctx.cpt++;
+
+  if(ctx.cpt == 270){
+    return (0);
+  }
+
   if(ctx.cpt >= 0 && ctx.trials[ctx.cpt]["ParticipantID"] != currentParticipant) {
     return(0);
     
   }
-
+  
   displayInstructions();
 }
 
@@ -408,8 +413,8 @@ var downloadLogs = function(event) {
   var downloadLink = d3.select("form")
   .append("a")
   .attr("href",encodedUri)
-  .attr("download","logs_"+ctx.trials[ctx.cpt][ctx.participantIndex]+"_"+Date.now()+".csv")
-  .text("logs_"+ctx.trials[ctx.cpt][ctx.participantIndex]+"_"+Date.now()+".csv");
+  .attr("download","logs_"+ctx.trials[ctx.cpt-1][ctx.participantIndex]+"_"+Date.now()+".csv")
+  .text("logs_"+ctx.trials[ctx.cpt-1][ctx.participantIndex]+"_"+Date.now()+".csv");
 }
 
 
